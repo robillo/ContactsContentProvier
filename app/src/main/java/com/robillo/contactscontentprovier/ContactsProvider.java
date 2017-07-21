@@ -18,7 +18,7 @@ import android.support.annotation.Nullable;
 @SuppressWarnings("ConstantConditions")
 public class ContactsProvider extends ContentProvider {
 
-    private static final String AUTHORITY = "com.androidtutorialpoint.mycontacts";
+    private static final String AUTHORITY = "com.robillo.contactscontentprovier";
     private static final String BASE_PATH = "contacts";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH );
 
@@ -72,7 +72,7 @@ public class ContactsProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
-        long id = database.insert(DBOpenHelper.TABLE_CONTACTS,null,contentValues);
+        long id = database.insert(DBOpenHelper.TABLE_CONTACTS, null, contentValues);
 
         if (id > 0) {
             Uri _uri = ContentUris.withAppendedId(CONTENT_URI, id);

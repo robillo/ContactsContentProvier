@@ -1,5 +1,6 @@
 package com.robillo.contactscontentprovier;
 
+import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
@@ -15,10 +16,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
+    private EditText name, phone;
+    private Button add;
     private ContactsCursorAdapter cursorAdapter;
     private static final String AUTHORITY = "com.robillo.contactscontentprovier";
     private static final String BASE_PATH = "contacts";
@@ -42,6 +47,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        name = (EditText) findViewById(R.id.name);
+        phone = (EditText) findViewById(R.id.phone);
+        add = (Button) findViewById(R.id.add);
+
+        final ContactsProvider provider = new ContactsProvider();
+
         cursorAdapter = new ContactsCursorAdapter(this, null, 0);
         ListView list = (ListView) findViewById(android.R.id.list);
         list.setAdapter(cursorAdapter);
@@ -58,6 +69,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 //                restartLoader();
 //            }
 //        });
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ContentValues values = new ContentValues();
+                values.put(DBOpenHelper.CONTACT_ID, 0);
+                values.put(DBOpenHelper.CONTACT_NAME, name.getText().toString());
+                values.put(DBOpenHelper.CONTACT_PHONE, phone.getText().toString());
+                values.put(DBOpenHelper.CONTACT_CREATED_ON, 1);
+                provider.insert(ContactsProvider.CONTENT_URI, values);
+            }
+        });
     }
 
     @Override
