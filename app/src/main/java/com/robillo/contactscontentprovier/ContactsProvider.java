@@ -18,17 +18,17 @@ import android.support.annotation.Nullable;
 @SuppressWarnings("ConstantConditions")
 public class ContactsProvider extends ContentProvider {
 
+    @SuppressWarnings("SpellCheckingInspection")
     private static final String AUTHORITY = "com.robillo.contactscontentprovier";
     private static final String BASE_PATH = "contacts";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH );
 
-    private static final int CONTACTS = 1;
-    private static final int CONTACT_ID = 2;
+    private static final int CONTACTS_URI_CODE = 1;
 
-    private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+    private static final UriMatcher uriMatcher;
     static {
-        uriMatcher.addURI(AUTHORITY,BASE_PATH, CONTACTS);
-        uriMatcher.addURI(AUTHORITY,BASE_PATH + "/#",CONTACT_ID);
+        uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+        uriMatcher.addURI(AUTHORITY, BASE_PATH, CONTACTS_URI_CODE);
     }
 
     private SQLiteDatabase database;
@@ -37,7 +37,7 @@ public class ContactsProvider extends ContentProvider {
     public boolean onCreate() {
         DBOpenHelper helper = new DBOpenHelper(getContext());
         database = helper.getWritableDatabase();
-        return true;
+        return database!=null;
     }
 
     @Nullable
@@ -45,8 +45,8 @@ public class ContactsProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, String[] strings, String s, String[] strings1, String s1) {
         Cursor cursor;
         switch (uriMatcher.match(uri)) {
-            case CONTACTS:
-                cursor =  database.query(DBOpenHelper.TABLE_CONTACTS,DBOpenHelper.ALL_COLUMNS,
+            case CONTACTS_URI_CODE:
+                cursor =  database.query(DBOpenHelper.TABLE_CONTACTS, DBOpenHelper.ALL_COLUMNS,
                         s,null,null,null,DBOpenHelper.CONTACT_NAME +" ASC");
                 break;
             default:
@@ -62,7 +62,7 @@ public class ContactsProvider extends ContentProvider {
     public String getType(@NonNull Uri uri) {
 
         switch (uriMatcher.match(uri)) {
-            case CONTACTS:
+            case CONTACTS_URI_CODE:
                 return "vnd.android.cursor.dir/contacts";
             default:
                 throw new IllegalArgumentException("This is an Unknown URI " + uri);
@@ -71,7 +71,7 @@ public class ContactsProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
+    public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues){
         long id = database.insert(DBOpenHelper.TABLE_CONTACTS, null, contentValues);
 
         if (id > 0) {
@@ -79,15 +79,15 @@ public class ContactsProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(_uri, null);
             return _uri;
         }
-        throw new SQLException("Insertion Failed for URI :" + uri);
 
+        throw new SQLException("Failed to add a record into " + uri);
     }
 
     @Override
     public int delete(@NonNull Uri uri, String s, String[] strings) {
         int delCount = 0;
         switch (uriMatcher.match(uri)) {
-            case CONTACTS:
+            case CONTACTS_URI_CODE:
                 delCount =  database.delete(DBOpenHelper.TABLE_CONTACTS,s,strings);
                 break;
             default:
@@ -101,7 +101,7 @@ public class ContactsProvider extends ContentProvider {
     public int update(@NonNull Uri uri, ContentValues contentValues, String s, String[] strings) {
         int updCount = 0;
         switch (uriMatcher.match(uri)) {
-            case CONTACTS:
+            case CONTACTS_URI_CODE:
                 updCount =  database.update(DBOpenHelper.TABLE_CONTACTS,contentValues,s,strings);
                 break;
             default:

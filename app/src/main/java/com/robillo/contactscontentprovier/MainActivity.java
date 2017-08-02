@@ -5,8 +5,6 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Loader;
@@ -23,11 +21,11 @@ import android.widget.ListView;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private EditText name, phone;
-    private Button add;
     private ContactsCursorAdapter cursorAdapter;
-    private static final String AUTHORITY = "com.robillo.contactscontentprovier";
+    private static final String AUTHORITY = "com.robillo.contactscontentprovier.ContactsProvider";
     private static final String BASE_PATH = "contacts";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH );
+    private ContactsProvider provider;
 
     // Constant to identify the requested operation
     private static final int CONTACTS = 1;
@@ -49,9 +47,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         name = (EditText) findViewById(R.id.name);
         phone = (EditText) findViewById(R.id.phone);
-        add = (Button) findViewById(R.id.add);
+        Button add = (Button) findViewById(R.id.add);
 
-        final ContactsProvider provider = new ContactsProvider();
+        provider = new ContactsProvider();
 
         cursorAdapter = new ContactsCursorAdapter(this, null, 0);
         ListView list = (ListView) findViewById(android.R.id.list);
@@ -62,22 +60,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Input Information:");
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                restartLoader();
-//            }
-//        });
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ContentValues values = new ContentValues();
-                values.put(DBOpenHelper.CONTACT_ID, 0);
+                values.put(DBOpenHelper.CONTACT_ID, (byte[]) null);
                 values.put(DBOpenHelper.CONTACT_NAME, name.getText().toString());
                 values.put(DBOpenHelper.CONTACT_PHONE, phone.getText().toString());
-                values.put(DBOpenHelper.CONTACT_CREATED_ON, 1);
-                provider.insert(ContactsProvider.CONTENT_URI, values);
+                values.put(DBOpenHelper.CONTACT_CREATED_ON, "fdbgdfbsd");
+                provider.insert(CONTENT_URI, values);
             }
         });
     }
@@ -104,9 +95,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return super.onOptionsItemSelected(item);
     }
 
-    private void restartLoader() {
-        getLoaderManager().restartLoader(0, null, this);
-    }
+//    private void restartLoader() {
+//        getLoaderManager().restartLoader(0, null, this);
+//    }
 
 
     @Override
